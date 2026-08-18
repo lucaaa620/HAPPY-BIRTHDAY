@@ -74,7 +74,6 @@ const renderer =
 
   });
 
-
 renderer.setPixelRatio(
   Math.min(
     window.devicePixelRatio,
@@ -82,16 +81,13 @@ renderer.setPixelRatio(
   )
 );
 
-
 renderer.setSize(
   window.innerWidth,
   window.innerHeight
 );
 
-
 renderer.outputColorSpace =
   THREE.SRGBColorSpace;
-
 
 container.appendChild(
   renderer.domElement
@@ -99,7 +95,7 @@ container.appendChild(
 
 
 /* =====================================================
-   STAR FIELD
+   STARS
 ===================================================== */
 
 const starGeometry =
@@ -424,45 +420,34 @@ let earthReady =
 ===================================================== */
 
 /*
-   Approximate center of India
+   IMPORTANT
 
-   Latitude  = 22.5° N
-   Longitude = 78.9° E
-*/
+   We are NOT using latitude/longitude
+   quaternion calculation here.
 
+   The previous calculation was causing
+   the Earth to stop around Africa.
 
-const INDIA_LATITUDE =
-  22.5;
-
-
-const INDIA_LONGITUDE =
-  78.9;
-
-
-/*
-   These values control where India
-   stops in front of the camera.
-
-   IMPORTANT:
-   The Earth texture orientation can
-   require a small longitude offset.
+   Instead, we use a fixed visual target
+   rotation and tune it according to the
+   Earth texture orientation.
 */
 
 
 const INDIA_TARGET_X =
   THREE.MathUtils.degToRad(
-    -INDIA_LATITUDE
+    20
   );
 
 
 const INDIA_TARGET_Y =
   THREE.MathUtils.degToRad(
-    INDIA_LONGITUDE
+    -258.9
   );
 
 
 /* =====================================================
-   OPENING TEXT
+   OPENING
 ===================================================== */
 
 setTimeout(
@@ -504,8 +489,7 @@ setTimeout(
 
 
     /*
-       Remove opening text
-       when Earth appears.
+       Remove opening text completely.
     */
 
     if (openingText) {
@@ -638,7 +622,6 @@ function startTimeTravel() {
       "show"
     );
 
-
     yearDisplay.textContent =
       "2026";
 
@@ -650,8 +633,8 @@ function startTimeTravel() {
 
 
   /*
-     Total animation time
-     = 9 seconds
+     Total animation:
+     9 seconds
   */
 
   const duration =
@@ -695,16 +678,14 @@ function startTimeTravel() {
 
     let currentYear =
       Math.round(
-
         2026 -
         20 *
         yearEased
-
       );
 
 
     /*
-       Final year must be 2006.
+       Force final year to 2006.
     */
 
     if (
@@ -750,7 +731,7 @@ function startTimeTravel() {
 
 
       /*
-         Fast rotation.
+         Multiple fast rotations.
       */
 
       const spinAmount =
@@ -779,7 +760,7 @@ function startTimeTravel() {
 
     /* =================================================
        PHASE 2
-       INDIA LOCK
+       INDIA TARGET
     ================================================= */
 
     else if (
@@ -804,8 +785,8 @@ function startTimeTravel() {
 
 
       /*
-         Smoothly bring India
-         toward the camera.
+         Smoothly rotate Earth toward
+         the fixed India target.
       */
 
       earth.rotation.x =
@@ -825,7 +806,7 @@ function startTimeTravel() {
 
 
       /*
-         Small camera movement.
+         Slight camera movement.
       */
 
       camera.position.z =
@@ -869,19 +850,20 @@ function startTimeTravel() {
 
 
       /*
-         Lock India.
+         LOCK EARTH.
+
+         No more rotation.
       */
 
       earth.rotation.x =
         INDIA_TARGET_X;
-
 
       earth.rotation.y =
         INDIA_TARGET_Y;
 
 
       /*
-         Zoom toward India.
+         Camera dives toward Earth.
       */
 
       camera.position.z =
@@ -901,7 +883,7 @@ function startTimeTravel() {
 
 
       /*
-         Increase atmospheric glow.
+         Increase atmosphere.
       */
 
       atmosphereMaterial.opacity =
@@ -947,7 +929,7 @@ function startTimeTravel() {
     else {
 
       /*
-         Guarantee 2006.
+         Final guarantee.
       */
 
       if (yearDisplay) {
@@ -994,7 +976,7 @@ function finishTravel() {
   /*
      TEMPORARY ENDING
 
-     Next stage:
+     Later we replace this with:
 
      INDIA
        ↓
@@ -1003,6 +985,8 @@ function finishTravel() {
      RAJASTHAN MAP
        ↓
      CLOUD DIVE
+       ↓
+     TEXT
   */
 
 
@@ -1068,7 +1052,7 @@ function animate() {
 
 
   /*
-     Slow Earth rotation
+     Slow idle Earth rotation
      before TAP.
   */
 
@@ -1084,7 +1068,7 @@ function animate() {
 
 
   /*
-     Slowly move stars.
+     Stars movement.
   */
 
   stars.rotation.y +=
