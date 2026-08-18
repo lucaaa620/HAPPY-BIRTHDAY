@@ -8,7 +8,7 @@ import * as THREE from "./three.module.js";
 
 
 /* =====================================================
-   DOM ELEMENTS
+   DOM
 ===================================================== */
 
 const container =
@@ -50,7 +50,6 @@ const camera =
     0.1,
     1000
   );
-
 
 camera.position.set(
   0,
@@ -100,16 +99,14 @@ container.appendChild(
 
 
 /* =====================================================
-   STAR FIELD
+   STARS
 ===================================================== */
 
 const starGeometry =
   new THREE.BufferGeometry();
 
-
 const STAR_COUNT =
   3500;
-
 
 const starPositions =
   new Float32Array(
@@ -177,7 +174,6 @@ const ambientLight =
     0.12
   );
 
-
 scene.add(
   ambientLight
 );
@@ -189,13 +185,11 @@ const sunLight =
     3.5
   );
 
-
 sunLight.position.set(
   5,
   2,
   5
 );
-
 
 scene.add(
   sunLight
@@ -208,13 +202,11 @@ const fillLight =
     0.35
   );
 
-
 fillLight.position.set(
   -4,
   1,
   -3
 );
-
 
 scene.add(
   fillLight
@@ -310,7 +302,7 @@ scene.add(
 
 
 /* =====================================================
-   INNER ATMOSPHERE
+   ATMOSPHERE
 ===================================================== */
 
 const atmosphereGeometry =
@@ -421,11 +413,29 @@ let started =
   false;
 
 
+/*
+   TRUE only while the time-travel
+   animation is running.
+*/
+
 let traveling =
   false;
 
 
+/*
+   Earth has appeared.
+*/
+
 let earthReady =
+  false;
+
+
+/*
+   Once this becomes TRUE, Earth
+   is permanently locked.
+*/
+
+let earthLocked =
   false;
 
 
@@ -436,17 +446,12 @@ let earthReady =
 /*
    IMPORTANT
 
-   We are using a fixed visual rotation
-   because the previous geographic
-   quaternion calculation was placing
-   the camera around Africa / ocean.
+   This is the current visual target
+   calibrated from the previous tests.
 
-   Current target:
-
-   X = latitude adjustment
-   Y = longitude adjustment
+   We are NOT using the old quaternion
+   latitude/longitude method.
 */
-
 
 const INDIA_TARGET_X =
   THREE.MathUtils.degToRad(
@@ -475,7 +480,6 @@ setTimeout(
 
     }
 
-
     fadeStarsIn();
 
   },
@@ -493,21 +497,19 @@ setTimeout(
     earth.visible =
       true;
 
-
     atmosphere.visible =
       true;
 
-
     outerAtmosphere.visible =
       true;
-
 
     earthReady =
       true;
 
 
     /*
-       Remove opening text completely.
+       Opening text disappears
+       as soon as Earth appears.
     */
 
     if (openingText) {
@@ -516,10 +518,8 @@ setTimeout(
         "show"
       );
 
-
       openingText.style.opacity =
         "0";
-
 
       openingText.style.visibility =
         "hidden";
@@ -528,7 +528,7 @@ setTimeout(
 
 
     /*
-       Show TAP TO BEGIN.
+       TAP TO BEGIN appears.
     */
 
     if (startButton) {
@@ -573,8 +573,7 @@ function fadeStarsIn() {
 
 
     if (
-      progress <
-      1
+      progress < 1
     ) {
 
       requestAnimationFrame(
@@ -600,9 +599,7 @@ function fadeStarsIn() {
 if (startButton) {
 
   startButton.addEventListener(
-
     "click",
-
     () => {
 
       if (started) {
@@ -624,7 +621,6 @@ if (startButton) {
       startTimeTravel();
 
     }
-
   );
 
 }
@@ -640,12 +636,15 @@ function startTimeTravel() {
     true;
 
 
+  earthLocked =
+    false;
+
+
   if (yearDisplay) {
 
     yearDisplay.classList.add(
       "show"
     );
-
 
     yearDisplay.textContent =
       "2026";
@@ -658,7 +657,8 @@ function startTimeTravel() {
 
 
   /*
-     Total animation time:
+     TOTAL TIME:
+
      9 seconds
   */
 
@@ -703,16 +703,14 @@ function startTimeTravel() {
 
     let currentYear =
       Math.round(
-
         2026 -
         20 *
         yearEased
-
       );
 
 
     /*
-       FINAL YEAR = 2006
+       NEVER allow 2007 as final year.
     */
 
     if (
@@ -758,7 +756,7 @@ function startTimeTravel() {
 
 
       /*
-         Multiple rotations.
+         Fast cinematic rotation.
       */
 
       const spinAmount =
@@ -772,7 +770,7 @@ function startTimeTravel() {
 
 
       /*
-         Small cinematic tilt.
+         Small tilt.
       */
 
       earth.rotation.x =
@@ -787,7 +785,7 @@ function startTimeTravel() {
 
     /* =================================================
        PHASE 2
-       INDIA TARGET
+       INDIA LOCK APPROACH
     ================================================= */
 
     else if (
@@ -812,8 +810,8 @@ function startTimeTravel() {
 
 
       /*
-         Smoothly move Earth
-         toward India target.
+         Move Earth toward
+         India target.
       */
 
       earth.rotation.x =
@@ -833,13 +831,21 @@ function startTimeTravel() {
 
 
       /*
-         Slow camera movement.
+         Slight camera movement.
       */
 
       camera.position.z =
         THREE.MathUtils.lerp(
           3.5,
           3.15,
+          eased
+        );
+
+
+      camera.position.y =
+        THREE.MathUtils.lerp(
+          0,
+          0.02,
           eased
         );
 
@@ -877,21 +883,23 @@ function startTimeTravel() {
 
 
       /*
-         LOCK EARTH
+         IMPORTANT:
 
-         No more rotation.
+         Earth is now LOCKED.
+
+         We do NOT rotate it anymore.
       */
 
       earth.rotation.x =
         INDIA_TARGET_X;
-
 
       earth.rotation.y =
         INDIA_TARGET_Y;
 
 
       /*
-         Camera zoom.
+         Camera zooms toward
+         the locked India position.
       */
 
       camera.position.z =
@@ -911,7 +919,7 @@ function startTimeTravel() {
 
 
       /*
-         Atmosphere becomes stronger.
+         Increase atmosphere.
       */
 
       atmosphereMaterial.opacity =
@@ -957,7 +965,7 @@ function startTimeTravel() {
     else {
 
       /*
-         Guarantee final year.
+         FINAL YEAR
       */
 
       if (yearDisplay) {
@@ -966,6 +974,18 @@ function startTimeTravel() {
           "2006";
 
       }
+
+
+      /*
+         Permanently lock Earth.
+      */
+
+      earthLocked =
+        true;
+
+
+      traveling =
+        false;
 
 
       finishTravel();
@@ -983,14 +1003,30 @@ function startTimeTravel() {
 
 
 /* =====================================================
-   FINISH
+   FINISH TRAVEL
 ===================================================== */
 
 function finishTravel() {
 
+  /*
+     IMPORTANT:
+
+     Earth stays exactly where it is.
+
+     No automatic rotation after this.
+  */
+
+  earthLocked =
+    true;
+
+
   traveling =
     false;
 
+
+  /*
+     Remove year.
+  */
 
   if (yearDisplay) {
 
@@ -1002,21 +1038,11 @@ function finishTravel() {
 
 
   /*
-     TEMPORARY ENDING
+     Show location immediately
+     after the Earth has locked.
 
-     Later this will become:
-
-     INDIA
-       ↓
-     RAJASTHAN
-       ↓
-     RAJASTHAN MAP
-       ↓
-     CLOUD DIVE
-       ↓
-     BIRTH TEXT
+     No 10–15 second waiting period.
   */
-
 
   setTimeout(
     () => {
@@ -1030,9 +1056,13 @@ function finishTravel() {
       }
 
     },
-    700
+    500
   );
 
+
+  /*
+     Hide location.
+  */
 
   setTimeout(
     () => {
@@ -1046,9 +1076,13 @@ function finishTravel() {
       }
 
     },
-    4000
+    4500
   );
 
+
+  /*
+     Final reveal.
+  */
 
   setTimeout(
     () => {
@@ -1069,7 +1103,7 @@ function finishTravel() {
 
 
 /* =====================================================
-   ANIMATION LOOP
+   MAIN ANIMATION LOOP
 ===================================================== */
 
 function animate() {
@@ -1079,13 +1113,29 @@ function animate() {
   );
 
 
+  /* ===================================================
+     IDLE EARTH ROTATION
+  =================================================== */
+
   /*
-     Slow Earth rotation before TAP.
+     Earth rotates ONLY before
+     the user presses TAP TO BEGIN.
+
+     After starting:
+       traveling = true
+
+     After India lock:
+       earthLocked = true
+
+     Therefore Earth can NEVER
+     start rotating again.
   */
 
   if (
     earthReady &&
-    !traveling
+    !started &&
+    !traveling &&
+    !earthLocked
   ) {
 
     earth.rotation.y +=
@@ -1094,17 +1144,17 @@ function animate() {
   }
 
 
-  /*
-     Slow star movement.
-  */
+  /* ===================================================
+     STARS
+  =================================================== */
 
   stars.rotation.y +=
     0.00002;
 
 
-  /*
-     Render.
-  */
+  /* ===================================================
+     RENDER
+  =================================================== */
 
   renderer.render(
     scene,
@@ -1114,6 +1164,10 @@ function animate() {
 }
 
 
+/* =====================================================
+   START ANIMATION
+===================================================== */
+
 animate();
 
 
@@ -1122,9 +1176,7 @@ animate();
 ===================================================== */
 
 window.addEventListener(
-
   "resize",
-
   () => {
 
     camera.aspect =
@@ -1149,5 +1201,4 @@ window.addEventListener(
     );
 
   }
-
 );
