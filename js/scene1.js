@@ -8,7 +8,7 @@ import * as THREE from "./three.module.js";
 
 
 /* =====================================================
-   DOM
+   DOM ELEMENTS
 ===================================================== */
 
 const container =
@@ -51,6 +51,7 @@ const camera =
     1000
   );
 
+
 camera.position.set(
   0,
   0,
@@ -74,6 +75,7 @@ const renderer =
 
   });
 
+
 renderer.setPixelRatio(
   Math.min(
     window.devicePixelRatio,
@@ -81,13 +83,16 @@ renderer.setPixelRatio(
   )
 );
 
+
 renderer.setSize(
   window.innerWidth,
   window.innerHeight
 );
 
+
 renderer.outputColorSpace =
   THREE.SRGBColorSpace;
+
 
 container.appendChild(
   renderer.domElement
@@ -95,14 +100,16 @@ container.appendChild(
 
 
 /* =====================================================
-   STARS
+   STAR FIELD
 ===================================================== */
 
 const starGeometry =
   new THREE.BufferGeometry();
 
+
 const STAR_COUNT =
   3500;
+
 
 const starPositions =
   new Float32Array(
@@ -170,6 +177,7 @@ const ambientLight =
     0.12
   );
 
+
 scene.add(
   ambientLight
 );
@@ -181,11 +189,13 @@ const sunLight =
     3.5
   );
 
+
 sunLight.position.set(
   5,
   2,
   5
 );
+
 
 scene.add(
   sunLight
@@ -198,11 +208,13 @@ const fillLight =
     0.35
   );
 
+
 fillLight.position.set(
   -4,
   1,
   -3
 );
+
 
 scene.add(
   fillLight
@@ -298,7 +310,7 @@ scene.add(
 
 
 /* =====================================================
-   ATMOSPHERE
+   INNER ATMOSPHERE
 ===================================================== */
 
 const atmosphereGeometry =
@@ -408,8 +420,10 @@ scene.add(
 let started =
   false;
 
+
 let traveling =
   false;
+
 
 let earthReady =
   false;
@@ -422,15 +436,15 @@ let earthReady =
 /*
    IMPORTANT
 
-   We are NOT using latitude/longitude
-   quaternion calculation here.
+   We are using a fixed visual rotation
+   because the previous geographic
+   quaternion calculation was placing
+   the camera around Africa / ocean.
 
-   The previous calculation was causing
-   the Earth to stop around Africa.
+   Current target:
 
-   Instead, we use a fixed visual target
-   rotation and tune it according to the
-   Earth texture orientation.
+   X = latitude adjustment
+   Y = longitude adjustment
 */
 
 
@@ -442,12 +456,12 @@ const INDIA_TARGET_X =
 
 const INDIA_TARGET_Y =
   THREE.MathUtils.degToRad(
-    -258.9
+    -78.9
   );
 
 
 /* =====================================================
-   OPENING
+   OPENING TEXT
 ===================================================== */
 
 setTimeout(
@@ -460,6 +474,7 @@ setTimeout(
       );
 
     }
+
 
     fadeStarsIn();
 
@@ -478,11 +493,14 @@ setTimeout(
     earth.visible =
       true;
 
+
     atmosphere.visible =
       true;
 
+
     outerAtmosphere.visible =
       true;
+
 
     earthReady =
       true;
@@ -498,8 +516,10 @@ setTimeout(
         "show"
       );
 
+
       openingText.style.opacity =
         "0";
+
 
       openingText.style.visibility =
         "hidden";
@@ -553,7 +573,8 @@ function fadeStarsIn() {
 
 
     if (
-      progress < 1
+      progress <
+      1
     ) {
 
       requestAnimationFrame(
@@ -579,7 +600,9 @@ function fadeStarsIn() {
 if (startButton) {
 
   startButton.addEventListener(
+
     "click",
+
     () => {
 
       if (started) {
@@ -601,6 +624,7 @@ if (startButton) {
       startTimeTravel();
 
     }
+
   );
 
 }
@@ -622,6 +646,7 @@ function startTimeTravel() {
       "show"
     );
 
+
     yearDisplay.textContent =
       "2026";
 
@@ -633,7 +658,7 @@ function startTimeTravel() {
 
 
   /*
-     Total animation:
+     Total animation time:
      9 seconds
   */
 
@@ -678,14 +703,16 @@ function startTimeTravel() {
 
     let currentYear =
       Math.round(
+
         2026 -
         20 *
         yearEased
+
       );
 
 
     /*
-       Force final year to 2006.
+       FINAL YEAR = 2006
     */
 
     if (
@@ -731,7 +758,7 @@ function startTimeTravel() {
 
 
       /*
-         Multiple fast rotations.
+         Multiple rotations.
       */
 
       const spinAmount =
@@ -785,8 +812,8 @@ function startTimeTravel() {
 
 
       /*
-         Smoothly rotate Earth toward
-         the fixed India target.
+         Smoothly move Earth
+         toward India target.
       */
 
       earth.rotation.x =
@@ -806,7 +833,7 @@ function startTimeTravel() {
 
 
       /*
-         Slight camera movement.
+         Slow camera movement.
       */
 
       camera.position.z =
@@ -828,7 +855,7 @@ function startTimeTravel() {
 
     /* =================================================
        PHASE 3
-       INDIA ZOOM
+       INDIA LOCK + ZOOM
     ================================================= */
 
     else {
@@ -850,7 +877,7 @@ function startTimeTravel() {
 
 
       /*
-         LOCK EARTH.
+         LOCK EARTH
 
          No more rotation.
       */
@@ -858,12 +885,13 @@ function startTimeTravel() {
       earth.rotation.x =
         INDIA_TARGET_X;
 
+
       earth.rotation.y =
         INDIA_TARGET_Y;
 
 
       /*
-         Camera dives toward Earth.
+         Camera zoom.
       */
 
       camera.position.z =
@@ -883,7 +911,7 @@ function startTimeTravel() {
 
 
       /*
-         Increase atmosphere.
+         Atmosphere becomes stronger.
       */
 
       atmosphereMaterial.opacity =
@@ -929,7 +957,7 @@ function startTimeTravel() {
     else {
 
       /*
-         Final guarantee.
+         Guarantee final year.
       */
 
       if (yearDisplay) {
@@ -955,7 +983,7 @@ function startTimeTravel() {
 
 
 /* =====================================================
-   FINISH TRAVEL
+   FINISH
 ===================================================== */
 
 function finishTravel() {
@@ -976,7 +1004,7 @@ function finishTravel() {
   /*
      TEMPORARY ENDING
 
-     Later we replace this with:
+     Later this will become:
 
      INDIA
        ↓
@@ -986,7 +1014,7 @@ function finishTravel() {
        ↓
      CLOUD DIVE
        ↓
-     TEXT
+     BIRTH TEXT
   */
 
 
@@ -1052,8 +1080,7 @@ function animate() {
 
 
   /*
-     Slow idle Earth rotation
-     before TAP.
+     Slow Earth rotation before TAP.
   */
 
   if (
@@ -1068,7 +1095,7 @@ function animate() {
 
 
   /*
-     Stars movement.
+     Slow star movement.
   */
 
   stars.rotation.y +=
@@ -1095,7 +1122,9 @@ animate();
 ===================================================== */
 
 window.addEventListener(
+
   "resize",
+
   () => {
 
     camera.aspect =
@@ -1120,4 +1149,5 @@ window.addEventListener(
     );
 
   }
+
 );
