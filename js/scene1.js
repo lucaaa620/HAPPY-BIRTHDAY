@@ -1,12 +1,28 @@
-const container =
-  document.getElementById("scene-container");
+import * as THREE from "./three.module.js";
 
 
 /* =========================================
-   THREE.JS SETUP
+   CONTAINER
+========================================= */
+
+const container =
+  document.getElementById("scene-container");
+
+if (!container) {
+  throw new Error("SCENE CONTAINER NOT FOUND");
+}
+
+
+/* =========================================
+   SCENE
 ========================================= */
 
 const scene = new THREE.Scene();
+
+
+/* =========================================
+   CAMERA
+========================================= */
 
 const camera =
   new THREE.PerspectiveCamera(
@@ -19,9 +35,13 @@ const camera =
 camera.position.set(
   0,
   0,
-  3.2
+  3.4
 );
 
+
+/* =========================================
+   RENDERER
+========================================= */
 
 const renderer =
   new THREE.WebGLRenderer({
@@ -30,9 +50,11 @@ const renderer =
     powerPreference: "high-performance"
   });
 
-
 renderer.setPixelRatio(
-  Math.min(window.devicePixelRatio, 2)
+  Math.min(
+    window.devicePixelRatio,
+    2
+  )
 );
 
 renderer.setSize(
@@ -43,26 +65,24 @@ renderer.setSize(
 renderer.outputColorSpace =
   THREE.SRGBColorSpace;
 
-
 container.appendChild(
   renderer.domElement
 );
 
 
 /* =========================================
-   STAR FIELD
+   STARS
 ========================================= */
 
 const starGeometry =
   new THREE.BufferGeometry();
 
-const STAR_COUNT = 2500;
+const STAR_COUNT = 3000;
 
 const starPositions =
   new Float32Array(
     STAR_COUNT * 3
   );
-
 
 for (
   let i = 0;
@@ -75,16 +95,13 @@ for (
 
 }
 
-
 starGeometry.setAttribute(
   "position",
-
   new THREE.BufferAttribute(
     starPositions,
     3
   )
 );
-
 
 const starMaterial =
   new THREE.PointsMaterial({
@@ -95,17 +112,17 @@ const starMaterial =
 
     transparent: true,
 
-    opacity: 0
+    opacity: 0,
+
+    depthWrite: false
 
   });
-
 
 const stars =
   new THREE.Points(
     starGeometry,
     starMaterial
   );
-
 
 scene.add(stars);
 
@@ -117,7 +134,7 @@ scene.add(stars);
 const ambientLight =
   new THREE.AmbientLight(
     0xffffff,
-    0.18
+    0.35
   );
 
 scene.add(
@@ -133,7 +150,7 @@ const sunLight =
 
 sunLight.position.set(
   5,
-  2,
+  3,
   5
 );
 
@@ -143,53 +160,76 @@ scene.add(
 
 
 /* =========================================
-   EARTH
+   EARTH TEXTURE
 ========================================= */
 
-const EARTH_RADIUS = 1;
+const textureLoader =
+  new THREE.TextureLoader();
 
+const earthTexture =
+  textureLoader.load(
+
+    "../assets/earth/earth-combined.jpg",
+
+    () => {
+
+      console.log(
+        "EARTH TEXTURE LOADED SUCCESSFULLY"
+      );
+
+    },
+
+    undefined,
+
+    (error) => {
+
+      console.error(
+        "EARTH TEXTURE FAILED TO LOAD",
+        error
+      );
+
+    }
+
+  );
+
+earthTexture.colorSpace =
+  THREE.SRGBColorSpace;
+
+
+/* =========================================
+   EARTH GEOMETRY
+========================================= */
 
 const earthGeometry =
   new THREE.SphereGeometry(
-    EARTH_RADIUS,
+    1,
     128,
     128
   );
 
 
-/*
-  FINAL FILE WILL LIVE IN:
-
-  assets/earth/earth-day.jpg
-*/
-
-const textureLoader =
-  new THREE.TextureLoader();
-
-
-const earthTexture =
-  textureLoader.load(
-    "assets/earth/earth-day.jpg"
-  );
-
-
-earthTexture.colorSpace =
-  THREE.SRGBColorSpace;
-
+/* =========================================
+   EARTH MATERIAL
+========================================= */
 
 const earthMaterial =
   new THREE.MeshPhongMaterial({
 
     map: earthTexture,
 
-    shininess: 18,
+    shininess: 12,
 
-    specular: new THREE.Color(
-      0x222222
-    )
+    specular:
+      new THREE.Color(
+        0x222222
+      )
 
   });
 
+
+/* =========================================
+   EARTH
+========================================= */
 
 const earth =
   new THREE.Mesh(
@@ -197,57 +237,10 @@ const earth =
     earthMaterial
   );
 
-
 earth.visible = false;
 
 scene.add(
   earth
-);
-
-
-/* =========================================
-   CLOUD LAYER
-========================================= */
-
-const cloudGeometry =
-  new THREE.SphereGeometry(
-    1.012,
-    128,
-    128
-  );
-
-
-const cloudTexture =
-  textureLoader.load(
-    "assets/earth/earth-clouds.png"
-  );
-
-
-const cloudMaterial =
-  new THREE.MeshPhongMaterial({
-
-    map: cloudTexture,
-
-    transparent: true,
-
-    opacity: 0.75,
-
-    depthWrite: false
-
-  });
-
-
-const clouds =
-  new THREE.Mesh(
-    cloudGeometry,
-    cloudMaterial
-  );
-
-
-clouds.visible = false;
-
-scene.add(
-  clouds
 );
 
 
@@ -262,7 +255,6 @@ const atmosphereGeometry =
     128
   );
 
-
 const atmosphereMaterial =
   new THREE.MeshBasicMaterial({
 
@@ -270,7 +262,7 @@ const atmosphereMaterial =
 
     transparent: true,
 
-    opacity: 0.16,
+    opacity: 0.18,
 
     side: THREE.BackSide,
 
@@ -281,13 +273,11 @@ const atmosphereMaterial =
 
   });
 
-
 const atmosphere =
   new THREE.Mesh(
     atmosphereGeometry,
     atmosphereMaterial
   );
-
 
 atmosphere.visible = false;
 
@@ -297,20 +287,7 @@ scene.add(
 
 
 /* =========================================
-   STATE
-========================================= */
-
-let started = false;
-
-let timeTravel = false;
-
-let earthIntro = false;
-
-let animationStart = 0;
-
-
-/* =========================================
-   DOM
+   DOM ELEMENTS
 ========================================= */
 
 const openingText =
@@ -340,25 +317,48 @@ const finalScreen =
 
 
 /* =========================================
+   STATE
+========================================= */
+
+let started = false;
+
+let timeTravel = false;
+
+let earthVisible = false;
+
+
+/* =========================================
    OPENING
 ========================================= */
 
 setTimeout(() => {
 
-  openingText.classList.add(
-    "show"
-  );
+  if (openingText) {
+
+    openingText.classList.add(
+      "show"
+    );
+
+  }
 
   fadeStarsIn();
 
 }, 600);
 
 
+/* =========================================
+   OPENING TEXT FADE OUT
+========================================= */
+
 setTimeout(() => {
 
-  openingText.classList.remove(
-    "show"
-  );
+  if (openingText) {
+
+    openingText.classList.remove(
+      "show"
+    );
+
+  }
 
 }, 2800);
 
@@ -371,15 +371,17 @@ setTimeout(() => {
 
   earth.visible = true;
 
-  clouds.visible = true;
-
   atmosphere.visible = true;
 
-  earthIntro = true;
+  earthVisible = true;
 
-  startButton.classList.add(
-    "show"
-  );
+  if (startButton) {
+
+    startButton.classList.add(
+      "show"
+    );
+
+  }
 
 }, 3500);
 
@@ -390,19 +392,22 @@ setTimeout(() => {
 
 function fadeStarsIn() {
 
-  const start =
+  const startTime =
     performance.now();
+
 
   function fade(now) {
 
     const progress =
       Math.min(
-        (now - start) / 1800,
+        (now - startTime) / 1800,
         1
       );
 
+
     starMaterial.opacity =
       progress * 0.9;
+
 
     if (progress < 1) {
 
@@ -414,6 +419,7 @@ function fadeStarsIn() {
 
   }
 
+
   requestAnimationFrame(
     fade
   );
@@ -422,25 +428,32 @@ function fadeStarsIn() {
 
 
 /* =========================================
-   START EXPERIENCE
+   TAP TO BEGIN
 ========================================= */
 
-startButton.addEventListener(
-  "click",
-  () => {
+if (startButton) {
 
-    if (started) return;
+  startButton.addEventListener(
+    "click",
 
-    started = true;
+    () => {
 
-    startButton.classList.remove(
-      "show"
-    );
+      if (started) {
+        return;
+      }
 
-    startTimeTravel();
+      started = true;
 
-  }
-);
+      startButton.classList.remove(
+        "show"
+      );
+
+      startTimeTravel();
+
+    }
+  );
+
+}
 
 
 /* =========================================
@@ -451,11 +464,16 @@ function startTimeTravel() {
 
   timeTravel = true;
 
-  yearDisplay.classList.add(
-    "show"
-  );
+  if (yearDisplay) {
 
-  animationStart =
+    yearDisplay.classList.add(
+      "show"
+    );
+
+  }
+
+
+  const startTime =
     performance.now();
 
   const duration =
@@ -465,19 +483,17 @@ function startTimeTravel() {
   function travel(now) {
 
     const elapsed =
-      now - animationStart;
+      now - startTime;
 
-    let progress =
+
+    const progress =
       Math.min(
         elapsed / duration,
         1
       );
 
 
-    /*
-      Fast beginning,
-      smooth slow ending.
-    */
+    /* Smooth easing */
 
     const eased =
       1 -
@@ -487,7 +503,9 @@ function startTimeTravel() {
       );
 
 
-    const year =
+    /* 2026 → 2006 */
+
+    const currentYear =
       Math.round(
         2026 -
         (2026 - 2006) *
@@ -495,40 +513,29 @@ function startTimeTravel() {
       );
 
 
-    yearDisplay.textContent =
-      year;
+    if (yearDisplay) {
+
+      yearDisplay.textContent =
+        currentYear;
+
+    }
 
 
-    /*
-      Earth rotation
-    */
+    /* Earth gets faster */
 
     earth.rotation.y +=
       0.015 +
       progress * 0.09;
 
 
-    /*
-      Clouds move independently
-    */
-
-    clouds.rotation.y +=
-      0.018 +
-      progress * 0.04;
-
-
-    /*
-      Camera moves toward Earth
-    */
+    /* Camera zoom */
 
     camera.position.z =
-      3.2 -
+      3.4 -
       progress * 1.55;
 
 
-    /*
-      Slight cinematic tilt
-    */
+    /* Cinematic camera movement */
 
     camera.position.y =
       Math.sin(
@@ -551,7 +558,7 @@ function startTimeTravel() {
 
     } else {
 
-      finishTravel();
+      finishTimeTravel();
 
     }
 
@@ -566,25 +573,27 @@ function startTimeTravel() {
 
 
 /* =========================================
-   FINISH TRAVEL
+   FINISH TIME TRAVEL
 ========================================= */
 
-function finishTravel() {
+function finishTimeTravel() {
 
   timeTravel = false;
 
-  yearDisplay.classList.remove(
-    "show"
-  );
+
+  if (yearDisplay) {
+
+    yearDisplay.classList.remove(
+      "show"
+    );
+
+  }
 
 
   /*
-    IMPORTANT:
+    Temporary location reveal.
 
-    This is currently the placeholder
-    for the real geographic transition.
-
-    Next version:
+    Later:
 
     EARTH
       ↓
@@ -598,27 +607,39 @@ function finishTravel() {
 
   setTimeout(() => {
 
-    locationScreen.classList.remove(
-      "hidden"
-    );
+    if (locationScreen) {
+
+      locationScreen.classList.remove(
+        "hidden"
+      );
+
+    }
 
   }, 700);
 
 
   setTimeout(() => {
 
-    locationScreen.classList.add(
-      "hidden"
-    );
+    if (locationScreen) {
+
+      locationScreen.classList.add(
+        "hidden"
+      );
+
+    }
 
   }, 4000);
 
 
   setTimeout(() => {
 
-    finalScreen.classList.remove(
-      "hidden"
-    );
+    if (finalScreen) {
+
+      finalScreen.classList.remove(
+        "hidden"
+      );
+
+    }
 
   }, 5200);
 
@@ -636,27 +657,26 @@ function animate() {
   );
 
 
-  /*
-    Normal Earth rotation
-  */
+  /* Slow Earth rotation */
 
   if (
-    earthIntro &&
+    earthVisible &&
     !timeTravel
   ) {
 
     earth.rotation.y +=
-      0.0014;
-
-    clouds.rotation.y +=
-      0.0019;
+      0.0015;
 
   }
 
 
+  /* Slow star movement */
+
   stars.rotation.y +=
     0.00003;
 
+
+  /* Render */
 
   renderer.render(
     scene,
@@ -670,23 +690,27 @@ animate();
 
 
 /* =========================================
-   RESPONSIVE
+   RESIZE
 ========================================= */
 
 window.addEventListener(
   "resize",
+
   () => {
 
     camera.aspect =
       window.innerWidth /
       window.innerHeight;
 
+
     camera.updateProjectionMatrix();
+
 
     renderer.setSize(
       window.innerWidth,
       window.innerHeight
     );
+
 
     renderer.setPixelRatio(
       Math.min(
