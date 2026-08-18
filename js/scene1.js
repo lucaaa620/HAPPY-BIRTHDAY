@@ -99,7 +99,7 @@ container.appendChild(
 
 
 /* =====================================================
-   STARS
+   STAR FIELD
 ===================================================== */
 
 const starGeometry =
@@ -302,7 +302,7 @@ scene.add(
 
 
 /* =====================================================
-   INNER ATMOSPHERE
+   ATMOSPHERE
 ===================================================== */
 
 const atmosphereGeometry =
@@ -424,82 +424,41 @@ let earthReady =
 ===================================================== */
 
 /*
-   INDIA
+   Approximate center of India
 
-   Latitude  ≈ 22.5° N
-   Longitude ≈ 78.9° E
+   Latitude  = 22.5° N
+   Longitude = 78.9° E
 */
 
-const INDIA_LAT =
+
+const INDIA_LATITUDE =
+  22.5;
+
+
+const INDIA_LONGITUDE =
+  78.9;
+
+
+/*
+   These values control where India
+   stops in front of the camera.
+
+   IMPORTANT:
+   The Earth texture orientation can
+   require a small longitude offset.
+*/
+
+
+const INDIA_TARGET_X =
   THREE.MathUtils.degToRad(
-    22.5
+    -INDIA_LATITUDE
   );
 
 
-const INDIA_LON =
+const INDIA_TARGET_Y =
   THREE.MathUtils.degToRad(
-    78.9
+    INDIA_LONGITUDE
   );
-
-
-/* =====================================================
-   INDIA TARGET ROTATION
-===================================================== */
-
-function createIndiaTargetQuaternion() {
-
-  const target =
-    new THREE.Vector3(
-
-      -Math.cos(
-        INDIA_LAT
-      ) *
-      Math.cos(
-        INDIA_LON
-      ),
-
-      Math.sin(
-        INDIA_LAT
-      ),
-
-      Math.cos(
-        INDIA_LAT
-      ) *
-      Math.sin(
-        INDIA_LON
-      )
-
-    );
-
-
-  target.normalize();
-
-
-  const cameraDirection =
-    new THREE.Vector3(
-      0,
-      0,
-      1
-    );
-
-
-  const quaternion =
-    new THREE.Quaternion();
-
-
-  quaternion.setFromUnitVectors(
-    target,
-    cameraDirection
-  );
-
-
-  return quaternion;
-
-}
-
-
-const INDIA_TARGET =
-  createIndiaTargetQuaternion();
 
 
 /* =====================================================
@@ -680,10 +639,6 @@ function startTimeTravel() {
     );
 
 
-    /*
-       Start at 2026.
-    */
-
     yearDisplay.textContent =
       "2026";
 
@@ -695,9 +650,8 @@ function startTimeTravel() {
 
 
   /*
-     TOTAL:
-
-     9 seconds
+     Total animation time
+     = 9 seconds
   */
 
   const duration =
@@ -750,7 +704,7 @@ function startTimeTravel() {
 
 
     /*
-       Final year MUST be 2006.
+       Final year must be 2006.
     */
 
     if (
@@ -805,15 +759,12 @@ function startTimeTravel() {
         spinEased;
 
 
-      earth.rotation.set(
-        0,
-        spinAmount,
-        0
-      );
+      earth.rotation.y =
+        spinAmount;
 
 
       /*
-         Small cinematic movement.
+         Small cinematic tilt.
       */
 
       earth.rotation.x =
@@ -853,13 +804,24 @@ function startTimeTravel() {
 
 
       /*
-         Smoothly lock onto India.
+         Smoothly bring India
+         toward the camera.
       */
 
-      earth.quaternion.slerp(
-        INDIA_TARGET,
-        eased
-      );
+      earth.rotation.x =
+        THREE.MathUtils.lerp(
+          earth.rotation.x,
+          INDIA_TARGET_X,
+          eased
+        );
+
+
+      earth.rotation.y =
+        THREE.MathUtils.lerp(
+          earth.rotation.y,
+          INDIA_TARGET_Y,
+          eased
+        );
 
 
       /*
@@ -872,6 +834,13 @@ function startTimeTravel() {
           3.15,
           eased
         );
+
+
+      camera.lookAt(
+        0,
+        0,
+        0
+      );
 
     }
 
@@ -900,16 +869,19 @@ function startTimeTravel() {
 
 
       /*
-         Keep India locked.
+         Lock India.
       */
 
-      earth.quaternion.copy(
-        INDIA_TARGET
-      );
+      earth.rotation.x =
+        INDIA_TARGET_X;
+
+
+      earth.rotation.y =
+        INDIA_TARGET_Y;
 
 
       /*
-         Camera moves toward Earth.
+         Zoom toward India.
       */
 
       camera.position.z =
@@ -929,7 +901,7 @@ function startTimeTravel() {
 
 
       /*
-         Atmosphere becomes stronger.
+         Increase atmospheric glow.
       */
 
       atmosphereMaterial.opacity =
@@ -975,7 +947,7 @@ function startTimeTravel() {
     else {
 
       /*
-         Final year guarantee.
+         Guarantee 2006.
       */
 
       if (yearDisplay) {
@@ -1001,7 +973,7 @@ function startTimeTravel() {
 
 
 /* =====================================================
-   FINISH
+   FINISH TRAVEL
 ===================================================== */
 
 function finishTravel() {
@@ -1022,16 +994,17 @@ function finishTravel() {
   /*
      TEMPORARY ENDING
 
-     Later:
+     Next stage:
 
      INDIA
        ↓
      RAJASTHAN
        ↓
-     MAP
+     RAJASTHAN MAP
        ↓
      CLOUD DIVE
   */
+
 
   setTimeout(
     () => {
@@ -1111,7 +1084,7 @@ function animate() {
 
 
   /*
-     Stars slowly move.
+     Slowly move stars.
   */
 
   stars.rotation.y +=
