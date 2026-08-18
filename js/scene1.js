@@ -461,7 +461,7 @@ const INDIA_TARGET_X =
 
 const INDIA_TARGET_Y =
   THREE.MathUtils.degToRad(
-    -78.9
+    -168.9
   );
 
 
