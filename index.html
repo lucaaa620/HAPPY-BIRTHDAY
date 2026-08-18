@@ -1,43 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
+
+  <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  />
+  >
 
   <title>SHAHIN — A BIRTHDAY JOURNEY</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- =====================================
+       CINEMATIC FONTS
+  ====================================== -->
+
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
   <link
     href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap"
     rel="stylesheet"
-  />
+  >
 
-  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- =====================================
+       CSS
+  ====================================== -->
+
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
+
 </head>
+
 
 <body>
 
+
+  <!-- =====================================
+       THREE.JS CONTAINER
+  ====================================== -->
+
   <main id="scene-container"></main>
 
-  <!-- CINEMATIC TEXT -->
 
-  <section id="opening-screen" class="screen">
+  <!-- =====================================
+       OPENING SCREEN
+  ====================================== -->
 
-    <div id="opening-text" class="cinematic-text">
+  <section
+    id="opening-screen"
+    class="screen"
+  >
+
+    <div
+      id="opening-text"
+      class="opening-text"
+    >
       EVERY STORY HAS A BEGINNING...
     </div>
 
   </section>
 
 
-  <!-- TAP TO BEGIN -->
+  <!-- =====================================
+       TAP TO BEGIN
+  ====================================== -->
 
-  <button id="start-button" class="start-button">
+  <button
+    id="start-button"
+    class="start-button"
+    type="button"
+  >
 
     <span class="tap-ring"></span>
 
@@ -48,18 +94,28 @@
   </button>
 
 
-  <!-- YEAR -->
+  <!-- =====================================
+       YEAR
+  ====================================== -->
 
-  <div id="year-display" class="year-display">
+  <div
+    id="year-display"
+    class="year-display"
+  >
     2026
   </div>
 
 
-  <!-- LOCATION -->
+  <!-- =====================================
+       LOCATION
+  ====================================== -->
 
-  <section id="location-screen" class="screen hidden">
+  <section
+    id="location-screen"
+    class="screen hidden"
+  >
 
-    <div class="location-text">
+    <div class="location-title">
       RAJASTHAN, INDIA
     </div>
 
@@ -70,37 +126,47 @@
   </section>
 
 
-  <!-- FINAL REVEAL -->
+  <!-- =====================================
+       FINAL REVEAL
+  ====================================== -->
 
-  <section id="final-screen" class="screen hidden">
+  <section
+    id="final-screen"
+    class="screen hidden"
+  >
 
-    <div class="final-line">
+    <div class="final-title">
       AND HERE... A BEAUTIFUL STORY BEGAN.
     </div>
 
-    <div class="final-subline">
+    <div class="final-subtitle">
       30 AUGUST 2006 — THE DAY SHAHIN'S STORY BEGAN.
     </div>
 
   </section>
 
 
-  <!-- VIGNETTE -->
+  <!-- =====================================
+       CINEMATIC VIGNETTE
+  ====================================== -->
 
   <div class="vignette"></div>
 
 
-  <!-- THREE.JS -->
+  <!-- =====================================
+       SCENE 1
+       
+       IMPORTANT:
+       scene1.js is an ES MODULE.
+       It will import Three.js itself.
+  ====================================== -->
 
   <script
-    src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js">
-  </script>
+    type="module"
+    src="js/scene1.js"
+  ></script>
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js">
-  </script>
-
-  <script src="js/scene1.js"></script>
 
 </body>
+
 </html>
