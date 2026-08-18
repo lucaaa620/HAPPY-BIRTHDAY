@@ -105,9 +105,9 @@ body {
   font-family: "Cinzel", serif;
 
   font-size: clamp(
-    22px,
-    4vw,
-    52px
+    28px,
+    5vw,
+    64px
   );
 
   font-weight: 500;
@@ -170,7 +170,7 @@ body {
 
   justify-content: center;
 
-  gap: 14px;
+  gap: 16px;
 
   opacity: 0;
 
@@ -201,16 +201,19 @@ body {
 ========================================= */
 
 .tap-ring {
-  width: 12px;
+  width: 14px;
 
-  height: 12px;
+  height: 14px;
 
   border-radius: 50%;
 
-  border: 1px solid rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,255,255,0.95);
 
   animation:
     tapPulse 1.8s ease-in-out infinite;
+
+  box-shadow:
+    0 0 12px rgba(255,255,255,0.25);
 }
 
 
@@ -223,7 +226,7 @@ body {
   }
 
   50% {
-    transform: scale(1.9);
+    transform: scale(2);
 
     opacity: 1;
   }
@@ -244,7 +247,7 @@ body {
 .tap-label {
   font-family: "Montserrat", sans-serif;
 
-  font-size: 11px;
+  font-size: 13px;
 
   font-weight: 500;
 
@@ -255,7 +258,7 @@ body {
   text-transform: uppercase;
 
   text-shadow:
-    0 0 15px rgba(255,255,255,0.35);
+    0 0 15px rgba(255,255,255,0.4);
 }
 
 
@@ -268,27 +271,27 @@ body {
 
   z-index: 15;
 
-  top: 8%;
+  top: 7%;
 
   left: 50%;
 
   transform: translateX(-50%);
 
-  /*
-     Elegant cinematic typography
-  */
-
   font-family: "Cinzel", serif;
 
+  /*
+     BIGGER CINEMATIC YEAR
+  */
+
   font-size: clamp(
-    38px,
-    7vw,
-    88px
+    48px,
+    9vw,
+    110px
   );
 
   font-weight: 400;
 
-  letter-spacing: 0.30em;
+  letter-spacing: 0.28em;
 
   line-height: 1;
 
@@ -302,9 +305,9 @@ body {
     opacity 0.8s ease;
 
   text-shadow:
-    0 0 12px rgba(255,255,255,0.65),
-    0 0 30px rgba(180,215,255,0.30),
-    0 0 60px rgba(120,180,255,0.12);
+    0 0 15px rgba(255,255,255,0.7),
+    0 0 35px rgba(180,215,255,0.35),
+    0 0 70px rgba(120,180,255,0.15);
 }
 
 
@@ -321,16 +324,16 @@ body {
   font-family: "Montserrat", sans-serif;
 
   font-size: clamp(
-    15px,
-    2.5vw,
-    28px
+    18px,
+    3vw,
+    32px
   );
 
   font-weight: 500;
 
   letter-spacing: 0.35em;
 
-  margin-bottom: 25px;
+  margin-bottom: 28px;
 
   text-shadow:
     0 0 20px rgba(255,255,255,0.3);
@@ -341,9 +344,9 @@ body {
   font-family: "Cinzel", serif;
 
   font-size: clamp(
-    30px,
-    6vw,
-    72px
+    38px,
+    7vw,
+    82px
   );
 
   font-weight: 500;
@@ -360,16 +363,16 @@ body {
 ========================================= */
 
 .final-title {
-  max-width: 1000px;
+  max-width: 1100px;
 
   padding: 30px;
 
   font-family: "Cinzel", serif;
 
   font-size: clamp(
-    25px,
-    5vw,
-    60px
+    30px,
+    5.5vw,
+    68px
   );
 
   font-weight: 500;
@@ -384,18 +387,18 @@ body {
 
 
 .final-subtitle {
-  max-width: 900px;
+  max-width: 950px;
 
   padding: 0 30px;
 
-  margin-top: 25px;
+  margin-top: 28px;
 
   font-family: "Montserrat", sans-serif;
 
   font-size: clamp(
-    12px,
-    2vw,
-    20px
+    14px,
+    2.2vw,
+    22px
   );
 
   font-weight: 400;
@@ -440,21 +443,21 @@ body {
   .opening-text {
     padding: 20px;
 
-    font-size: 24px;
+    font-size: 28px;
 
     letter-spacing: 0.09em;
   }
 
 
   .location-title {
-    font-size: 14px;
+    font-size: 16px;
 
     letter-spacing: 0.20em;
   }
 
 
   .birth-date {
-    font-size: 30px;
+    font-size: 34px;
 
     letter-spacing: 0.07em;
   }
@@ -463,32 +466,39 @@ body {
   .final-title {
     padding: 20px;
 
-    font-size: 28px;
+    font-size: 30px;
 
     letter-spacing: 0.04em;
   }
 
 
   .final-subtitle {
-    font-size: 11px;
+    font-size: 12px;
 
     letter-spacing: 0.1em;
   }
 
 
   .year-display {
-    top: 8%;
+    top: 7%;
 
-    font-size: 42px;
+    font-size: 52px;
 
-    letter-spacing: 0.20em;
+    letter-spacing: 0.18em;
   }
 
 
   .tap-label {
-    font-size: 10px;
+    font-size: 11px;
 
     letter-spacing: 0.32em;
+  }
+
+
+  .tap-ring {
+    width: 13px;
+
+    height: 13px;
   }
 
 }
