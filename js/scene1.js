@@ -105,8 +105,10 @@ container.appendChild(
 const starGeometry =
   new THREE.BufferGeometry();
 
+
 const STAR_COUNT =
   3500;
+
 
 const starPositions =
   new Float32Array(
@@ -127,12 +129,14 @@ for (
 
 
 starGeometry.setAttribute(
+
   "position",
 
   new THREE.BufferAttribute(
     starPositions,
     3
   )
+
 );
 
 
@@ -174,6 +178,7 @@ const ambientLight =
     0.12
   );
 
+
 scene.add(
   ambientLight
 );
@@ -185,11 +190,13 @@ const sunLight =
     3.5
   );
 
+
 sunLight.position.set(
   5,
   2,
   5
 );
+
 
 scene.add(
   sunLight
@@ -202,11 +209,13 @@ const fillLight =
     0.35
   );
 
+
 fillLight.position.set(
   -4,
   1,
   -3
 );
+
 
 scene.add(
   fillLight
@@ -302,7 +311,7 @@ scene.add(
 
 
 /* =====================================================
-   ATMOSPHERE
+   INNER ATMOSPHERE
 ===================================================== */
 
 const atmosphereGeometry =
@@ -339,8 +348,11 @@ const atmosphereMaterial =
 
 const atmosphere =
   new THREE.Mesh(
+
     atmosphereGeometry,
+
     atmosphereMaterial
+
   );
 
 
@@ -391,8 +403,11 @@ const outerAtmosphereMaterial =
 
 const outerAtmosphere =
   new THREE.Mesh(
+
     outerAtmosphereGeometry,
+
     outerAtmosphereMaterial
+
   );
 
 
@@ -413,27 +428,13 @@ let started =
   false;
 
 
-/*
-   TRUE only while the time-travel
-   animation is running.
-*/
-
 let traveling =
   false;
 
 
-/*
-   Earth has appeared.
-*/
-
 let earthReady =
   false;
 
-
-/*
-   Once this becomes TRUE, Earth
-   is permanently locked.
-*/
 
 let earthLocked =
   false;
@@ -444,13 +445,7 @@ let earthLocked =
 ===================================================== */
 
 /*
-   IMPORTANT
-
-   This is the current visual target
-   calibrated from the previous tests.
-
-   We are NOT using the old quaternion
-   latitude/longitude method.
+   Existing calibrated India position.
 */
 
 const INDIA_TARGET_X =
@@ -466,10 +461,35 @@ const INDIA_TARGET_Y =
 
 
 /* =====================================================
+   RAJASTHAN TARGET
+===================================================== */
+
+/*
+   Rajasthan focus target.
+
+   This is intentionally kept separate
+   so we can fine-tune the visual position
+   without changing the India animation.
+*/
+
+const RAJASTHAN_TARGET_X =
+  THREE.MathUtils.degToRad(
+    27
+  );
+
+
+const RAJASTHAN_TARGET_Y =
+  THREE.MathUtils.degToRad(
+    -174.2
+  );
+
+
+/* =====================================================
    OPENING TEXT
 ===================================================== */
 
 setTimeout(
+
   () => {
 
     if (openingText) {
@@ -483,7 +503,9 @@ setTimeout(
     fadeStarsIn();
 
   },
+
   600
+
 );
 
 
@@ -492,6 +514,7 @@ setTimeout(
 ===================================================== */
 
 setTimeout(
+
   () => {
 
     earth.visible =
@@ -508,8 +531,7 @@ setTimeout(
 
 
     /*
-       Opening text disappears
-       as soon as Earth appears.
+       Hide opening text.
     */
 
     if (openingText) {
@@ -528,7 +550,7 @@ setTimeout(
 
 
     /*
-       TAP TO BEGIN appears.
+       Show TAP TO BEGIN.
     */
 
     if (startButton) {
@@ -540,7 +562,9 @@ setTimeout(
     }
 
   },
+
   3500
+
 );
 
 
@@ -558,17 +582,24 @@ function fadeStarsIn() {
 
     const progress =
       Math.min(
+
         (now - startTime) /
           2200,
+
         1
+
       );
 
 
     starMaterial.opacity =
       THREE.MathUtils.smoothstep(
+
         progress,
+
         0,
+
         1
+
       ) * 0.9;
 
 
@@ -599,7 +630,9 @@ function fadeStarsIn() {
 if (startButton) {
 
   startButton.addEventListener(
+
     "click",
+
     () => {
 
       if (started) {
@@ -621,6 +654,7 @@ if (startButton) {
       startTimeTravel();
 
     }
+
   );
 
 }
@@ -659,11 +693,24 @@ function startTimeTravel() {
   /*
      TOTAL TIME:
 
-     9 seconds
+     0.00 - 4.30
+     FAST EARTH ROTATION
+
+     4.30 - 6.50
+     INDIA FOCUS
+
+     6.50 - 8.50
+     INDIA ZOOM
+
+     8.50 - 11.50
+     RAJASTHAN FOCUS
+
+     11.50 - 12.50
+     FINAL LOCK
   */
 
   const duration =
-    9000;
+    12500;
 
 
   function travel(now) {
@@ -674,9 +721,12 @@ function startTimeTravel() {
 
     const progress =
       Math.min(
+
         elapsed /
           duration,
+
         1
+
       );
 
 
@@ -686,36 +736,39 @@ function startTimeTravel() {
 
     const yearProgress =
       Math.min(
+
         progress /
-          0.82,
+          0.78,
+
         1
+
       );
 
 
     const yearEased =
       1 -
       Math.pow(
+
         1 -
           yearProgress,
+
         3
+
       );
 
 
     let currentYear =
       Math.round(
+
         2026 -
-        20 *
-        yearEased
+          20 *
+          yearEased
+
       );
 
 
-    /*
-       NEVER allow 2007 as final year.
-    */
-
     if (
-      progress >=
-      0.82
+      progress >= 0.78
     ) {
 
       currentYear =
@@ -738,20 +791,23 @@ function startTimeTravel() {
     ================================================= */
 
     if (
-      progress <
-      0.48
+      progress < 0.345
     ) {
 
       const spinProgress =
         progress /
-        0.48;
+        0.345;
 
 
       const spinEased =
         THREE.MathUtils.smoothstep(
+
           spinProgress,
+
           0,
+
           1
+
         );
 
 
@@ -770,91 +826,122 @@ function startTimeTravel() {
 
 
       /*
-         Small tilt.
+         Small cinematic tilt.
       */
 
       earth.rotation.x =
         Math.sin(
+
           spinProgress *
-          Math.PI
+            Math.PI
+
         ) *
         0.06;
+
+
+      /*
+         Slight camera push.
+      */
+
+      camera.position.z =
+        THREE.MathUtils.lerp(
+
+          3.5,
+
+          3.25,
+
+          spinEased
+
+        );
 
     }
 
 
     /* =================================================
        PHASE 2
-       INDIA LOCK APPROACH
+       INDIA FOCUS
     ================================================= */
 
     else if (
-      progress <
-      0.72
+      progress < 0.52
     ) {
 
-      const targetProgress =
+      const indiaProgress =
         (
+
           progress -
-          0.48
+            0.345
+
         ) /
-        0.24;
+        0.175;
 
 
       const eased =
         THREE.MathUtils.smootherstep(
-          targetProgress,
+
+          indiaProgress,
+
           0,
+
           1
+
         );
 
 
       /*
-         Move Earth toward
-         India target.
+         Rotate Earth toward India.
       */
 
       earth.rotation.x =
         THREE.MathUtils.lerp(
+
           earth.rotation.x,
+
           INDIA_TARGET_X,
+
           eased
+
         );
 
 
       earth.rotation.y =
         THREE.MathUtils.lerp(
+
           earth.rotation.y,
+
           INDIA_TARGET_Y,
+
           eased
+
         );
 
 
       /*
-         Slight camera movement.
+         Camera moves closer.
       */
 
       camera.position.z =
         THREE.MathUtils.lerp(
-          3.5,
-          3.15,
+
+          3.25,
+
+          3.0,
+
           eased
+
         );
 
 
       camera.position.y =
         THREE.MathUtils.lerp(
+
           0,
+
           0.02,
+
           eased
+
         );
-
-
-      camera.lookAt(
-        0,
-        0,
-        0
-      );
 
     }
 
@@ -864,86 +951,333 @@ function startTimeTravel() {
        INDIA LOCK + ZOOM
     ================================================= */
 
-    else {
+    else if (
+      progress < 0.68
+    ) {
 
-      const zoomProgress =
+      const indiaZoomProgress =
         (
+
           progress -
-          0.72
+            0.52
+
         ) /
-        0.28;
+        0.16;
 
 
       const eased =
         THREE.MathUtils.smootherstep(
-          zoomProgress,
+
+          indiaZoomProgress,
+
           0,
+
           1
+
         );
 
 
       /*
-         IMPORTANT:
-
-         Earth is now LOCKED.
-
-         We do NOT rotate it anymore.
+         India remains centered.
       */
 
       earth.rotation.x =
         INDIA_TARGET_X;
+
 
       earth.rotation.y =
         INDIA_TARGET_Y;
 
 
       /*
-         Camera zooms toward
-         the locked India position.
+         Camera zoom.
       */
 
       camera.position.z =
         THREE.MathUtils.lerp(
-          3.15,
-          1.75,
+
+          3.0,
+
+          2.05,
+
           eased
+
         );
 
 
       camera.position.y =
         THREE.MathUtils.lerp(
-          0,
+
+          0.02,
+
           0.04,
+
           eased
+
         );
 
 
       /*
-         Increase atmosphere.
+         Atmosphere becomes stronger.
       */
 
       atmosphereMaterial.opacity =
         THREE.MathUtils.lerp(
+
           0.18,
+
           0.30,
+
           eased
+
         );
 
 
       outerAtmosphereMaterial.opacity =
         THREE.MathUtils.lerp(
+
           0.055,
+
           0.10,
+
           eased
+
         );
 
     }
 
 
+    /* =================================================
+       PHASE 4
+       INDIA → RAJASTHAN
+    ================================================= */
+
+    else if (
+      progress < 0.92
+    ) {
+
+      const rajasthanProgress =
+        (
+
+          progress -
+            0.68
+
+        ) /
+        0.24;
+
+
+      const eased =
+        THREE.MathUtils.smootherstep(
+
+          rajasthanProgress,
+
+          0,
+
+          1
+
+        );
+
+
+      /*
+         Move from India
+         toward Rajasthan.
+      */
+
+      earth.rotation.x =
+        THREE.MathUtils.lerp(
+
+          INDIA_TARGET_X,
+
+          RAJASTHAN_TARGET_X,
+
+          eased
+
+        );
+
+
+      earth.rotation.y =
+        THREE.MathUtils.lerp(
+
+          INDIA_TARGET_Y,
+
+          RAJASTHAN_TARGET_Y,
+
+          eased
+
+        );
+
+
+      /*
+         Deep cinematic zoom.
+      */
+
+      camera.position.z =
+        THREE.MathUtils.lerp(
+
+          2.05,
+
+          1.48,
+
+          eased
+
+        );
+
+
+      /*
+         Slight downward movement.
+      */
+
+      camera.position.y =
+        THREE.MathUtils.lerp(
+
+          0.04,
+
+          0.06,
+
+          eased
+
+        );
+
+
+      /*
+         Atmosphere gets stronger.
+      */
+
+      atmosphereMaterial.opacity =
+        THREE.MathUtils.lerp(
+
+          0.30,
+
+          0.38,
+
+          eased
+
+        );
+
+
+      outerAtmosphereMaterial.opacity =
+        THREE.MathUtils.lerp(
+
+          0.10,
+
+          0.13,
+
+          eased
+
+        );
+
+    }
+
+
+    /* =================================================
+       PHASE 5
+       RAJASTHAN FINAL APPROACH
+    ================================================= */
+
+    else {
+
+      const finalProgress =
+        (
+
+          progress -
+            0.92
+
+        ) /
+        0.08;
+
+
+      const eased =
+        THREE.MathUtils.smootherstep(
+
+          finalProgress,
+
+          0,
+
+          1
+
+        );
+
+
+      /*
+         Rajasthan stays centered.
+      */
+
+      earth.rotation.x =
+        RAJASTHAN_TARGET_X;
+
+
+      earth.rotation.y =
+        RAJASTHAN_TARGET_Y;
+
+
+      /*
+         Final slow push.
+      */
+
+      camera.position.z =
+        THREE.MathUtils.lerp(
+
+          1.48,
+
+          1.36,
+
+          eased
+
+        );
+
+
+      camera.position.y =
+        THREE.MathUtils.lerp(
+
+          0.06,
+
+          0.07,
+
+          eased
+
+        );
+
+
+      /*
+         Strong cinematic atmosphere.
+      */
+
+      atmosphereMaterial.opacity =
+        THREE.MathUtils.lerp(
+
+          0.38,
+
+          0.42,
+
+          eased
+
+        );
+
+
+      outerAtmosphereMaterial.opacity =
+        THREE.MathUtils.lerp(
+
+          0.13,
+
+          0.15,
+
+          eased
+
+        );
+
+    }
+
+
+    /* =================================================
+       CAMERA LOOK
+    ================================================= */
+
     camera.lookAt(
+
       0,
       0,
       0
+
     );
 
 
@@ -952,8 +1286,7 @@ function startTimeTravel() {
     ================================================= */
 
     if (
-      progress <
-      1
+      progress < 1
     ) {
 
       requestAnimationFrame(
@@ -962,10 +1295,11 @@ function startTimeTravel() {
 
     }
 
+
     else {
 
       /*
-         FINAL YEAR
+         Final year.
       */
 
       if (yearDisplay) {
@@ -977,8 +1311,16 @@ function startTimeTravel() {
 
 
       /*
-         Permanently lock Earth.
+         Lock Rajasthan.
       */
+
+      earth.rotation.x =
+        RAJASTHAN_TARGET_X;
+
+
+      earth.rotation.y =
+        RAJASTHAN_TARGET_Y;
+
 
       earthLocked =
         true;
@@ -1008,14 +1350,6 @@ function startTimeTravel() {
 
 function finishTravel() {
 
-  /*
-     IMPORTANT:
-
-     Earth stays exactly where it is.
-
-     No automatic rotation after this.
-  */
-
   earthLocked =
     true;
 
@@ -1038,13 +1372,11 @@ function finishTravel() {
 
 
   /*
-     Show location immediately
-     after the Earth has locked.
-
-     No 10–15 second waiting period.
+     Show location.
   */
 
   setTimeout(
+
     () => {
 
       if (locationScreen) {
@@ -1056,7 +1388,9 @@ function finishTravel() {
       }
 
     },
+
     500
+
   );
 
 
@@ -1065,6 +1399,7 @@ function finishTravel() {
   */
 
   setTimeout(
+
     () => {
 
       if (locationScreen) {
@@ -1076,7 +1411,9 @@ function finishTravel() {
       }
 
     },
+
     4500
+
   );
 
 
@@ -1085,6 +1422,7 @@ function finishTravel() {
   */
 
   setTimeout(
+
     () => {
 
       if (finalScreen) {
@@ -1096,7 +1434,9 @@ function finishTravel() {
       }
 
     },
+
     5200
+
   );
 
 }
@@ -1120,22 +1460,18 @@ function animate() {
   /*
      Earth rotates ONLY before
      the user presses TAP TO BEGIN.
-
-     After starting:
-       traveling = true
-
-     After India lock:
-       earthLocked = true
-
-     Therefore Earth can NEVER
-     start rotating again.
   */
 
   if (
+
     earthReady &&
+
     !started &&
+
     !traveling &&
+
     !earthLocked
+
   ) {
 
     earth.rotation.y +=
@@ -1157,8 +1493,11 @@ function animate() {
   =================================================== */
 
   renderer.render(
+
     scene,
+
     camera
+
   );
 
 }
@@ -1176,7 +1515,9 @@ animate();
 ===================================================== */
 
 window.addEventListener(
+
   "resize",
+
   () => {
 
     camera.aspect =
@@ -1188,17 +1529,26 @@ window.addEventListener(
 
 
     renderer.setSize(
+
       window.innerWidth,
+
       window.innerHeight
+
     );
 
 
     renderer.setPixelRatio(
+
       Math.min(
+
         window.devicePixelRatio,
+
         2
+
       )
+
     );
 
   }
+
 );
