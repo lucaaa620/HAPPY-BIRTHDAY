@@ -421,6 +421,468 @@ scene.add(
 
 
 /* =====================================================
+   CLOUD TRANSITION SYSTEM
+===================================================== */
+
+/*
+   We create the cloud texture ourselves using
+   a small canvas. No external cloud asset needed.
+*/
+
+function createCloudTexture() {
+
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width =
+    256;
+
+  canvas.height =
+    256;
+
+
+  const ctx =
+    canvas.getContext(
+      "2d"
+    );
+
+
+  const gradient =
+    ctx.createRadialGradient(
+      128,
+      128,
+      5,
+      128,
+      128,
+      125
+    );
+
+
+  gradient.addColorStop(
+    0,
+    "rgba(255,255,255,0.95)"
+  );
+
+  gradient.addColorStop(
+    0.35,
+    "rgba(255,255,255,0.75)"
+  );
+
+  gradient.addColorStop(
+    0.65,
+    "rgba(255,255,255,0.35)"
+  );
+
+  gradient.addColorStop(
+    1,
+    "rgba(255,255,255,0)"
+  );
+
+
+  ctx.fillStyle =
+    gradient;
+
+
+  ctx.fillRect(
+    0,
+    0,
+    256,
+    256
+  );
+
+
+  const texture =
+    new THREE.CanvasTexture(
+      canvas
+    );
+
+
+  texture.colorSpace =
+    THREE.SRGBColorSpace;
+
+
+  return texture;
+
+}
+
+
+const cloudTexture =
+  createCloudTexture();
+
+
+const cloudGroup =
+  new THREE.Group();
+
+
+scene.add(
+  cloudGroup
+);
+
+
+/* =====================================================
+   CLOUD PARTICLES
+===================================================== */
+
+const CLOUD_COUNT =
+  42;
+
+
+const clouds =
+  [];
+
+
+for (
+  let i = 0;
+  i < CLOUD_COUNT;
+  i++
+) {
+
+  const material =
+    new THREE.SpriteMaterial({
+
+      map:
+        cloudTexture,
+
+      transparent:
+        true,
+
+      opacity:
+        0,
+
+      depthWrite:
+        false,
+
+      blending:
+        THREE.NormalBlending
+
+    });
+
+
+  const cloud =
+    new THREE.Sprite(
+      material
+    );
+
+
+  /*
+     Start clouds far from
+     the camera.
+  */
+
+  cloud.position.set(
+
+    (Math.random() - 0.5) * 5,
+
+    (Math.random() - 0.5) * 4,
+
+    -2 -
+      Math.random() * 7
+
+  );
+
+
+  const scale =
+    0.8 +
+    Math.random() * 1.8;
+
+
+  cloud.scale.set(
+
+    scale,
+
+    scale *
+      (0.55 +
+        Math.random() * 0.4),
+
+    1
+
+  );
+
+
+  cloud.userData = {
+
+    baseX:
+      cloud.position.x,
+
+    baseY:
+      cloud.position.y,
+
+    startZ:
+      cloud.position.z,
+
+    speed:
+      0.018 +
+      Math.random() * 0.035,
+
+    drift:
+      Math.random() * Math.PI * 2,
+
+    scale:
+      scale
+
+  };
+
+
+  cloudGroup.add(
+    cloud
+  );
+
+
+  clouds.push(
+    cloud
+  );
+
+}
+
+
+/* =====================================================
+   CLOUD STATE
+===================================================== */
+
+let cloudTransitionActive =
+  false;
+
+
+let cloudTransitionProgress =
+  0;
+
+
+let cloudFade =
+  0;
+
+
+/* =====================================================
+   CLOUD ANIMATION
+===================================================== */
+
+function updateClouds() {
+
+  if (
+    !cloudTransitionActive
+  ) {
+
+    return;
+
+  }
+
+
+  /*
+     Cloud fade-in.
+  */
+
+  cloudFade =
+    THREE.MathUtils.lerp(
+
+      cloudFade,
+
+      1,
+
+      0.035
+
+    );
+
+
+  for (
+    let i = 0;
+    i < clouds.length;
+    i++
+  ) {
+
+    const cloud =
+      clouds[i];
+
+
+    const data =
+      cloud.userData;
+
+
+    /*
+       Clouds move toward
+       the camera.
+
+       The closer they get,
+       the larger they become.
+    */
+
+    cloud.position.z +=
+      data.speed *
+      (
+        1 +
+        cloudTransitionProgress *
+        7
+      );
+
+
+    /*
+       Slight sideways movement.
+    */
+
+    cloud.position.x =
+      data.baseX +
+      Math.sin(
+        performance.now() *
+          0.0004 +
+          data.drift
+      ) *
+      0.08;
+
+
+    cloud.position.y =
+      data.baseY +
+      Math.cos(
+        performance.now() *
+          0.00035 +
+          data.drift
+      ) *
+      0.06;
+
+
+    /*
+       Cloud gets larger as
+       it approaches camera.
+    */
+
+    const distance =
+      Math.max(
+        0.5,
+        5 +
+        cloud.position.z
+      );
+
+
+    const size =
+      data.scale *
+      (
+        1 +
+        cloudTransitionProgress *
+        5
+      ) /
+      distance;
+
+
+    cloud.scale.set(
+
+      size * 2.0,
+
+      size * 1.15,
+
+      1
+
+    );
+
+
+    /*
+       Opacity increases.
+    */
+
+    cloud.material.opacity =
+      Math.min(
+
+        0.9,
+
+        cloudFade *
+        (
+          0.35 +
+          cloudTransitionProgress *
+          0.8
+        )
+
+      );
+
+
+    /*
+       Reset cloud when it
+       passes the camera.
+    */
+
+    if (
+      cloud.position.z >
+      2.5
+    ) {
+
+      cloud.position.z =
+        -5 -
+        Math.random() * 5;
+
+
+      cloud.position.x =
+        (Math.random() - 0.5) * 5;
+
+
+      cloud.position.y =
+        (Math.random() - 0.5) * 4;
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   CLOUD TRANSITION START
+===================================================== */
+
+function startCloudTransition() {
+
+  cloudTransitionActive =
+    true;
+
+
+  cloudTransitionProgress =
+    0;
+
+
+  cloudFade =
+    0;
+
+}
+
+
+/* =====================================================
+   CLOUD TRANSITION END
+===================================================== */
+
+function stopCloudTransition() {
+
+  cloudTransitionActive =
+    false;
+
+
+  cloudTransitionProgress =
+    0;
+
+
+  cloudFade =
+    0;
+
+
+  for (
+    let i = 0;
+    i < clouds.length;
+    i++
+  ) {
+
+    const cloud =
+      clouds[i];
+
+
+    cloud.material.opacity =
+      0;
+
+
+    cloud.position.z =
+      -5 -
+      Math.random() * 5;
+
+  }
+
+}
+
+
+/* =====================================================
    STATE
 ===================================================== */
 
@@ -445,7 +907,8 @@ let earthLocked =
 ===================================================== */
 
 /*
-   Existing calibrated India position.
+   This is the working India
+   calibration from your current scene.
 */
 
 const INDIA_TARGET_X =
@@ -465,11 +928,12 @@ const INDIA_TARGET_Y =
 ===================================================== */
 
 /*
-   Rajasthan focus target.
+   IMPORTANT:
 
-   This is intentionally kept separate
-   so we can fine-tune the visual position
-   without changing the India animation.
+   These are the values that are
+   currently working correctly.
+
+   DO NOT CHANGE THEM.
 */
 
 const RAJASTHAN_TARGET_X =
@@ -674,6 +1138,9 @@ function startTimeTravel() {
     false;
 
 
+  stopCloudTransition();
+
+
   if (yearDisplay) {
 
     yearDisplay.classList.add(
@@ -691,7 +1158,7 @@ function startTimeTravel() {
 
 
   /*
-     TOTAL TIME:
+     TIMELINE
 
      0.00 - 4.30
      FAST EARTH ROTATION
@@ -702,11 +1169,12 @@ function startTimeTravel() {
      6.50 - 8.50
      INDIA ZOOM
 
-     8.50 - 11.50
+     8.50 - 10.80
      RAJASTHAN FOCUS
 
-     11.50 - 12.50
-     FINAL LOCK
+     10.80 - 12.50
+     RAJASTHAN DESCENT
+     + CLOUD TRANSITION
   */
 
   const duration =
@@ -738,7 +1206,7 @@ function startTimeTravel() {
       Math.min(
 
         progress /
-          0.78,
+          0.62,
 
         1
 
@@ -768,7 +1236,7 @@ function startTimeTravel() {
 
 
     if (
-      progress >= 0.78
+      progress >= 0.62
     ) {
 
       currentYear =
@@ -811,10 +1279,6 @@ function startTimeTravel() {
         );
 
 
-      /*
-         Fast cinematic rotation.
-      */
-
       const spinAmount =
         Math.PI *
         5.5 *
@@ -825,10 +1289,6 @@ function startTimeTravel() {
         spinAmount;
 
 
-      /*
-         Small cinematic tilt.
-      */
-
       earth.rotation.x =
         Math.sin(
 
@@ -838,10 +1298,6 @@ function startTimeTravel() {
         ) *
         0.06;
 
-
-      /*
-         Slight camera push.
-      */
 
       camera.position.z =
         THREE.MathUtils.lerp(
@@ -888,10 +1344,6 @@ function startTimeTravel() {
         );
 
 
-      /*
-         Rotate Earth toward India.
-      */
-
       earth.rotation.x =
         THREE.MathUtils.lerp(
 
@@ -915,10 +1367,6 @@ function startTimeTravel() {
 
         );
 
-
-      /*
-         Camera moves closer.
-      */
 
       camera.position.z =
         THREE.MathUtils.lerp(
@@ -977,10 +1425,6 @@ function startTimeTravel() {
         );
 
 
-      /*
-         India remains centered.
-      */
-
       earth.rotation.x =
         INDIA_TARGET_X;
 
@@ -988,10 +1432,6 @@ function startTimeTravel() {
       earth.rotation.y =
         INDIA_TARGET_Y;
 
-
-      /*
-         Camera zoom.
-      */
 
       camera.position.z =
         THREE.MathUtils.lerp(
@@ -1016,10 +1456,6 @@ function startTimeTravel() {
 
         );
 
-
-      /*
-         Atmosphere becomes stronger.
-      */
 
       atmosphereMaterial.opacity =
         THREE.MathUtils.lerp(
@@ -1053,7 +1489,7 @@ function startTimeTravel() {
     ================================================= */
 
     else if (
-      progress < 0.92
+      progress < 0.865
     ) {
 
       const rajasthanProgress =
@@ -1063,7 +1499,7 @@ function startTimeTravel() {
             0.68
 
         ) /
-        0.24;
+        0.185;
 
 
       const eased =
@@ -1079,8 +1515,8 @@ function startTimeTravel() {
 
 
       /*
-         Move from India
-         toward Rajasthan.
+         KEEPING YOUR WORKING
+         RAJASTHAN POSITION.
       */
 
       earth.rotation.x =
@@ -1108,7 +1544,7 @@ function startTimeTravel() {
 
 
       /*
-         Deep cinematic zoom.
+         Moderate zoom.
       */
 
       camera.position.z =
@@ -1116,39 +1552,31 @@ function startTimeTravel() {
 
           2.05,
 
-          1.48,
+          1.72,
 
           eased
 
         );
 
-
-      /*
-         Slight downward movement.
-      */
 
       camera.position.y =
         THREE.MathUtils.lerp(
 
           0.04,
 
-          0.06,
+          0.055,
 
           eased
 
         );
 
 
-      /*
-         Atmosphere gets stronger.
-      */
-
       atmosphereMaterial.opacity =
         THREE.MathUtils.lerp(
 
           0.30,
 
-          0.38,
+          0.37,
 
           eased
 
@@ -1171,25 +1599,27 @@ function startTimeTravel() {
 
     /* =================================================
        PHASE 5
-       RAJASTHAN FINAL APPROACH
+       RAJASTHAN LOCK
     ================================================= */
 
-    else {
+    else if (
+      progress < 0.90
+    ) {
 
-      const finalProgress =
+      const lockProgress =
         (
 
           progress -
-            0.92
+            0.865
 
         ) /
-        0.08;
+        0.035;
 
 
       const eased =
         THREE.MathUtils.smootherstep(
 
-          finalProgress,
+          lockProgress,
 
           0,
 
@@ -1199,7 +1629,7 @@ function startTimeTravel() {
 
 
       /*
-         Rajasthan stays centered.
+         LOCK RAJASTHAN.
       */
 
       earth.rotation.x =
@@ -1211,15 +1641,15 @@ function startTimeTravel() {
 
 
       /*
-         Final slow push.
+         Very small push.
       */
 
       camera.position.z =
         THREE.MathUtils.lerp(
 
-          1.48,
+          1.72,
 
-          1.36,
+          1.65,
 
           eased
 
@@ -1229,25 +1659,21 @@ function startTimeTravel() {
       camera.position.y =
         THREE.MathUtils.lerp(
 
-          0.06,
+          0.055,
 
-          0.07,
+          0.06,
 
           eased
 
         );
 
 
-      /*
-         Strong cinematic atmosphere.
-      */
-
       atmosphereMaterial.opacity =
         THREE.MathUtils.lerp(
 
-          0.38,
+          0.37,
 
-          0.42,
+          0.40,
 
           eased
 
@@ -1260,6 +1686,145 @@ function startTimeTravel() {
           0.13,
 
           0.15,
+
+          eased
+
+        );
+
+    }
+
+
+    /* =================================================
+       PHASE 6
+       ENTER RAJASTHAN
+       CLOUD TRANSITION
+    ================================================= */
+
+    else {
+
+      const descentProgress =
+        (
+
+          progress -
+            0.90
+
+        ) /
+        0.10;
+
+
+      const eased =
+        THREE.MathUtils.smootherstep(
+
+          descentProgress,
+
+          0,
+
+          1
+
+        );
+
+
+      /*
+         Rajasthan remains locked.
+      */
+
+      earth.rotation.x =
+        RAJASTHAN_TARGET_X;
+
+
+      earth.rotation.y =
+        RAJASTHAN_TARGET_Y;
+
+
+      /*
+         Start clouds.
+      */
+
+      if (
+        !cloudTransitionActive
+      ) {
+
+        startCloudTransition();
+
+      }
+
+
+      cloudTransitionProgress =
+        eased;
+
+
+      /*
+         Camera moves forward.
+
+         We are NOT showing
+         Rajasthan land.
+
+         This only creates the
+         feeling of entering it.
+      */
+
+      camera.position.z =
+        THREE.MathUtils.lerp(
+
+          1.65,
+
+          0.82,
+
+          eased
+
+        );
+
+
+      camera.position.y =
+        THREE.MathUtils.lerp(
+
+          0.06,
+
+          0.075,
+
+          eased
+
+        );
+
+
+      /*
+         Atmosphere becomes intense.
+      */
+
+      atmosphereMaterial.opacity =
+        THREE.MathUtils.lerp(
+
+          0.40,
+
+          0.65,
+
+          eased
+
+        );
+
+
+      outerAtmosphereMaterial.opacity =
+        THREE.MathUtils.lerp(
+
+          0.15,
+
+          0.23,
+
+          eased
+
+        );
+
+
+      /*
+         Slight brightness increase.
+      */
+
+      sunLight.intensity =
+        THREE.MathUtils.lerp(
+
+          3.5,
+
+          4.4,
 
           eased
 
@@ -1298,10 +1863,6 @@ function startTimeTravel() {
 
     else {
 
-      /*
-         Final year.
-      */
-
       if (yearDisplay) {
 
         yearDisplay.textContent =
@@ -1311,7 +1872,7 @@ function startTimeTravel() {
 
 
       /*
-         Lock Rajasthan.
+         Final Rajasthan lock.
       */
 
       earth.rotation.x =
@@ -1328,6 +1889,15 @@ function startTimeTravel() {
 
       traveling =
         false;
+
+
+      /*
+         Clouds reach maximum
+         coverage for a moment.
+      */
+
+      cloudTransitionProgress =
+        1;
 
 
       finishTravel();
@@ -1359,20 +1929,32 @@ function finishTravel() {
 
 
   /*
-     Remove year.
+     Keep clouds for a short
+     cinematic transition.
   */
 
-  if (yearDisplay) {
+  setTimeout(
 
-    yearDisplay.classList.remove(
-      "show"
-    );
+    () => {
 
-  }
+      if (yearDisplay) {
+
+        yearDisplay.classList.remove(
+          "show"
+        );
+
+      }
+
+    },
+
+    250
+
+  );
 
 
   /*
-     Show location.
+     Show location while clouds
+     are still fading.
   */
 
   setTimeout(
@@ -1389,7 +1971,24 @@ function finishTravel() {
 
     },
 
-    500
+    700
+
+  );
+
+
+  /*
+     Fade clouds away.
+  */
+
+  setTimeout(
+
+    () => {
+
+      stopCloudTransition();
+
+    },
+
+    1150
 
   );
 
@@ -1457,11 +2056,6 @@ function animate() {
      IDLE EARTH ROTATION
   =================================================== */
 
-  /*
-     Earth rotates ONLY before
-     the user presses TAP TO BEGIN.
-  */
-
   if (
 
     earthReady &&
@@ -1486,6 +2080,13 @@ function animate() {
 
   stars.rotation.y +=
     0.00002;
+
+
+  /* ===================================================
+     CLOUDS
+  =================================================== */
+
+  updateClouds();
 
 
   /* ===================================================
