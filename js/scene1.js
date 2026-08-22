@@ -474,13 +474,13 @@ const INDIA_TARGET_Y =
 
 const RAJASTHAN_TARGET_X =
   THREE.MathUtils.degToRad(
-    27
+    21.8
   );
 
 
 const RAJASTHAN_TARGET_Y =
   THREE.MathUtils.degToRad(
-    -174.2
+    -170.8
   );
 
 
