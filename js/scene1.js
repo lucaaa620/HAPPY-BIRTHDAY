@@ -450,13 +450,13 @@ let earthLocked =
 
 const INDIA_TARGET_X =
   THREE.MathUtils.degToRad(
-    20
+    24
   );
 
 
 const INDIA_TARGET_Y =
   THREE.MathUtils.degToRad(
-    -168.9
+    -164.5
   );
 
 
